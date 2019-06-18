@@ -1,24 +1,26 @@
 const request = require('supertest')
-const {Genre} = require('../../models/genre')
-const {User} = require('../../models/user')
+const {Genre} = require('../../../models/genre')
+const {User} = require('../../../models/user')
 const mongoose = require('mongoose')
 
 let server
 
 
 describe('/api/genres', () => {
-  beforeEach( () => { server = require('../../app') })
-  afterEach( async () => { 
-    server.close() 
-    await Genre.remove({}) 
+  beforeEach( () => { server = require('../../../app') })
+  afterEach( async () => {    
+    await Genre.deleteOne({}) 
+    await server.close() 
   })
 
   describe('GET /', () => {
     it('should return all genres', async () => {
-      await Genre.collection.insertMany([
+      const genres = [
         { name: 'genre1' },
         { name: 'genre2' }
-      ])
+      ]
+
+      await Genre.collection.insertMany(genres)
 
       const res = await request(server).get('/api/genres')
       
@@ -34,7 +36,7 @@ describe('/api/genres', () => {
       const genre = new Genre( { name: 'genre1'} )
       await genre.save()
 
-      const res = await request(server).get('api/genres/' + genre._id)
+      const res = await request(server).get('/api/genres/' + genre._id)
 
       expect(res.status).toBe(200)
       expect(res.body).toHaveProperty( 'name', genre.name)
@@ -59,7 +61,7 @@ describe('/api/genres', () => {
     let token
     let name
     
-    const exec = async () => {
+    const execute = async () => {
       return await request(server)
       .post('/api/genres')
       .set('x-auth-token', token)
@@ -74,7 +76,7 @@ describe('/api/genres', () => {
     it('should return 401 if the client is not logged in',async () => {
       token = ''
 
-      const res = await exec()
+      const res = await execute()
 
       expect(res.status).toBe(401)
     })
@@ -82,21 +84,21 @@ describe('/api/genres', () => {
     it('should return 400 if genre is less than 5 characters',async () => {
       name ='1234'
      
-      const res = await exec()
+      const res = await execute()
 
       expect(res.status).toBe(400)
     })
 
-    it('should return 400 if genre is more than 20 characters',async () => {
+    it('should return 400 if genre is more than 50 characters',async () => {
       name = new Array(52).join('a')
      
-      const res = await exec()
+      const res = await execute()
 
       expect(res.status).toBe(400)
     })
 
     it('should save the genre if it is valid',async () => {
-      await exec() 
+      await execute() 
 
       const genre = await Genre.find({ name: 'genre1' })
 
@@ -104,7 +106,7 @@ describe('/api/genres', () => {
     })
 
     it('should return the genre if it is valid',async () => {         
-      const res = await exec()
+      const res = await execute()
 
       expect(res.body).toHaveProperty('_id')
 

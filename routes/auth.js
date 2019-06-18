@@ -2,7 +2,6 @@ const mongoose = require('mongoose') // for db work
 const express = require('express')   // for api work
 const router = express.Router()      // linking user route to app.js 
 const {User} = require('../models/user')
-const _ = require('lodash')
 const bcrypt = require('bcrypt')
 const Joi = require('joi')
 const jwt = require('jsonwebtoken')
@@ -26,13 +25,13 @@ router.post('/', async (req, res) => {
   res.send(token)
 })
 
-const validate = (req) => {
+const validate = (requestBody) => {
   const schema = {
-    email: Joi.string().min(8).max(50).required().email(),
+    email: Joi.string().email().min(8).max(50).required(),
     password: Joi.string().min(5).max(255).required(),
   }
 
-  return Joi.validate(req, schema)
+  return Joi.validate(requestBody, schema)
 }
 
 

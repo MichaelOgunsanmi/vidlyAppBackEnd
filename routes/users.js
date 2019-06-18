@@ -1,9 +1,10 @@
 const mongoose = require('mongoose') // for db work
 const express = require('express')   // for api work
 const router = express.Router()      // linking user route to app.js 
-const {User, validate} = require('../models/user')
 const _ = require('lodash')
 const bcrypt = require('bcrypt')
+
+const {User, validate} = require('../models/user')
 const auth = require('../middlewares/auth')
 
 router.get('/me', auth, async (req, res) => {
