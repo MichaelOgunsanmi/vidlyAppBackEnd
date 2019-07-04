@@ -4,7 +4,6 @@ const router = express.Router()
 const {Genre, validate} = require('../models/genre')
 const auth = require('../middlewares/auth')
 const admin = require('../middlewares/admin')
-require('express-async-errors')
 const validateObjectId = require('../middlewares/validateObjectId')
 
 
